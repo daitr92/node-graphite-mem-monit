@@ -28,6 +28,12 @@ module.exports = (() => {
             currentDeep.used = mem.heapUsed/1024/1024;
 
             client.write(memoryMetrics);
+
+            if (process.env.GRAPHITE_TRIGGER_GC === 'true' &&
+                currentDeep.used > Number(process.env.GRAPHITE_TRIGGER_GC_LIMIT_HEAP) &&
+                global.gc) {
+                global.gc()
+            }
         }, Number(process.env.GRAPHITE_INTERVAL) || 10000);
     }
 })();
